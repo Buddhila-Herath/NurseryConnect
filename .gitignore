@@ -1,0 +1,44 @@
+# Xcode
+#
+# gitignore contributors: better-gitignore-bot, x70b1n, nscoding
+
+## Build results
+build/
+DerivedData/
+
+## GNU-style backup files
+*~
+
+## User-specific files
+*.orig
+*.swp
+*.bak
+*.moved-aside
+*.xcuserstate
+xcuserdata/
+
+## Apple-specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Scheme settings
+!default.xcscheme
+
+## Project settings
+!project.pbxproj
+!contents.xcworkspacedata
+
+## Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+Package.resolved
+
+## Other
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
