@@ -1,84 +1,173 @@
-# NurseryConnect MVP 🧭
+# kidsapp
 
-**NurseryConnect** is a specialized iOS application designed for nursery keyworkers (Early Years Practitioners). It provides a seamless, offline-first experience for tracking children's daily activities, including meals, sleep, mood, and health-related events.
+kidsapp is an iOS SwiftUI application for recording and reviewing daily nursery diary updates per child.
 
-## 🎯 Key Features
+The app is offline-first and uses SwiftData for local persistence. It includes seeded sample data so the app is usable immediately on first launch.
 
-### 👤 My Children Dashboard
-- **Real-time Overview**: View a list of all assigned children (Noah, Lily, Oliver).
-- **Search & Filter**: Quickly find children by name.
-- **Health Alerts**: Immediate visual indicators for children with registered allergies.
-- **Daily Progress**: Smart badges highlight children missing diary entries for today.
+## Overview
 
-### 📅 Child Diary Timeline
-- **Chronological Tracking**: A clean, color-coded timeline of all daily events.
-- **Activity Types**: Specialized tracking for Meals, Sleep, Nappy, Mood, and Activities.
-- **Smart Filtering**: Toggle between "Today Only" and "Full History" views.
-- **Emergency Access**: Quick-action button to view emergency contact details.
+This project helps early years practitioners track day-to-day child activities in a structured timeline.
 
-### 📝 Add Diary Entry (Dynamic Form)
-- **Conditional UI**: Form adapts for Meals (Food/Portion), Sleep (Times), or Nappy (Type).
-- **Validation**: Alerts ensure critical data is captured before saving.
+Core goals:
 
----
+- Keep a clear list of assigned children
+- Show allergy and daily update signals at a glance
+- Record diary entries quickly with type-specific input forms
+- Review entries in chronological order with optional "today only" filtering
 
-## 🛠 Technical Stack
+## Features
 
-- **Platform**: iOS 17.0+ (SwiftUI)
-- **Database**: SwiftData (Local, Offline-first)
-- **Architecture**: Lightweight MVVM
-- **Testing**: XCTest with in-memory SwiftData configuration.
+### My Children Dashboard
 
----
+- Lists all children sorted by name
+- Search by child name using a built-in search bar
+- Shows allergy warning icon on child rows
+- Shows a blue missing-entry indicator when no entry exists for today
+- Opens each child profile into their diary timeline
 
-## 📁 Project Structure & Files
+### Child Diary Screen
 
-### 📂 App/
-- **NurseryConnectApp.swift**: Entry point. Initializes SwiftData and handles seeding.
+- Displays child profile header (avatar, name, age)
+- Shows allergy banner for children with allergies
+- Supports emergency contact action via alert
+- Timeline section displays entries newest-first
+- Toggle to switch between "Show Today Only" and full history
+- Swipe-to-delete for each diary record
 
-### 📂 Models/
-- **Child.swift**: `Child` entity (Name, Age, Allergies, Emergency Contact).
-- **DiaryEntry.swift**: `DiaryEntry` entity and `EntryType` enum.
+### Add Entry Screen
 
-### 📂 ViewModels/
-- **ChildViewModel.swift**: Dashboard logic (Search, status computation).
-- **DiaryViewModel.swift**: Timeline logic (Filtering, adding/deleting entries).
+- Activity types: Meal, Sleep, Nappy, Mood, Activity
+- Dynamic form fields by type:
+   - Meal: food and portion
+   - Sleep: start and end time
+   - Nappy: nappy type
+- Optional notes field for all types
+- Validation for required meal food input
+- Saves to SwiftData and dismisses on success
 
-### 📂 Views/
-- **MyChildrenView.swift**: Main dashboard screen.
-- **ChildDiaryView.swift**: Timeline view for a specific child.
-- **AddEntryView.swift**: Dynamic form for adding activities.
-- **Components/**: Reusable views like `ChildRow` and `DiaryEntryRow`.
+## Technical Stack
 
-### 📂 Data/
-- **SampleData.swift**: Seeding logic for initial testing.
+- Language: Swift
+- UI: SwiftUI
+- Persistence: SwiftData
+- Architecture: Lightweight MVVM with observable view models
+- Target platform: iOS (SwiftData requires modern iOS; use iOS 17+)
 
-### 📂 NurseryConnectTests/
-- **DiaryViewModelTests.swift**: Unit tests for business logic.
+## Architecture
 
----
+### App Entry
 
-## ⚙️ Setup Instructions (Xcode 15+)
+- kidsappApp sets up the SwiftData model container with Child and DiaryEntry models
+- Seeds initial sample data asynchronously on first launch
 
-1. **Create Project**: Create a new iOS App project in Xcode called `NurseryConnect`.
-2. **Settings**: Set **Interface** to `SwiftUI` and **Language** to `Swift`.
-3. **Minimum target**: Ensure **Minimum Deployments** is set to **iOS 17.0**.
-4. **Import Files**: 
-   - Delete the default `ContentView.swift` and `NurseryConnectApp.swift`.
-   - Right-click your project folder and select **Add Files to "NurseryConnect"...**
-   - Select all the folders (`App`, `Models`, `ViewModels`, `Views`, `Data`, `Utils`, `NurseryConnectTests`) from this directory.
-5. **Run**: Select an iOS 17 Simulator and press **Cmd + R**.
+### Data Models
 
----
+- Child:
+   - id (unique UUID)
+   - name
+   - age
+   - allergies [String]
+   - emergencyContact
+   - avatar
+   - diaryEntries relationship (cascade delete)
 
-## 🧪 Verification & Walkthrough
+- DiaryEntry:
+   - id (unique UUID)
+   - type (EntryType enum)
+   - timestamp
+   - note
+   - Optional meal fields: food, portion
+   - Optional sleep fields: startTime, endTime
+   - Optional nappy field: nappyType
+   - Optional child reference
 
-- [x] **Sample Data**: Noah, Lily, and Oliver appear correctly on first launch.
-- [x] **Navigation**: Smooth transitions between list and diary views.
-- [x] **Adding Entries**: New entries save and update the UI instantly.
-- [x] **Validation**: Error alerts trigger if required fields (like Food) are missing.
-- [x] **Emergency Contact**: Correct contact info shows in the emergency alert.
-- [x] **Unit Tests**: Pass for entry addition, deletion, and date filtering.
+- EntryType enum values:
+   - meal
+   - sleep
+   - nappy
+   - mood
+   - activity
 
----
-*Built with ❤️ for Early Years Practitioners.*
+### View Models
+
+- ChildViewModel:
+   - Handles search filtering on child list
+   - Computes "missing today entry" state for dashboard indicators
+
+- DiaryViewModel:
+   - Provides sorted timeline entries
+   - Applies "today only" filter
+   - Handles add and delete operations for entries
+
+### Reusable Utilities
+
+- Date extension for formatted time/date and isToday helper
+- Color extension for entry-type colors
+- Shake geometry effect included for potential UI feedback animation
+
+## Seed Data Behavior
+
+On first app launch (only if no children exist), the app inserts:
+
+- Noah (age 3, allergy: peanuts)
+- Lily (age 2, allergy: dairy)
+- Oliver (age 4, no listed allergies)
+
+It also inserts initial diary entries for Noah:
+
+- Meal entry (Pasta, Full)
+- Sleep entry (sample time range)
+
+## Project Structure
+
+```text
+kidsapp/
+   ContentView.swift
+   kidsappApp.swift
+   Data/
+      SampleData.swift
+   Models/
+      Child.swift
+      DiaryEntry.swift
+   Utils/
+      Extensions.swift
+   ViewModels/
+      ChildViewModel.swift
+      DiaryViewModel.swift
+   Views/
+      AddEntryView.swift
+      ChildDiaryView.swift
+      MyChildrenView.swift
+      Components/
+         ChildRow.swift
+         DiaryEntryRow.swift
+```
+
+## How To Run
+
+1. Open kidsapp.xcodeproj in Xcode.
+2. Select an iOS simulator (iOS 17 or above).
+3. Build and run the app.
+4. On first launch, confirm sample children and entries appear automatically.
+
+## Typical User Flow
+
+1. Open My Children screen.
+2. Search/select a child.
+3. Review diary timeline and allergy status.
+4. Tap plus button to add a new entry.
+5. Save and verify new entry appears in timeline.
+6. Optionally use swipe-to-delete to remove an entry.
+
+## Current Notes
+
+- Data is stored locally using SwiftData.
+- No external backend sync is currently implemented.
+- Emergency action currently opens an alert with contact details.
+
+## Future Improvements
+
+- Add edit support for existing entries
+- Add richer validation (for example sleep end time after start time)
+- Add automated unit/UI tests
+- Add export or sync capability
